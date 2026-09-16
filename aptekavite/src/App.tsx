@@ -1,41 +1,33 @@
 // src/App.tsx
 // ---------------------------------------------------------
-// Простая страница: таблица лекарств + поля для добавления
-// новой строки + кнопка удаления. Данные берутся из заглушки
-// MedicineAPI (адаптирована под тему проекта, см. src/MedicineAPI.ts).
-// Стили не используются — страница намеренно без оформления.
+// Компонент-контейнер: связывает данные (MedicineService)
+// с отображением (MedicineTable, AddMedicineForm).
+// Сам ничего не рендерит "по мелочи" — только раскладывает
+// более простые компоненты по местам и передаёт им данные
+// и обработчики.
 // ---------------------------------------------------------
 
 import { useState } from 'react'
-import MedicineAPI from './MedicineAPI'
+import { medicineService } from './services/MedicineService'
+import type Medicine from './models/Medicine'
+import MedicineTable from './components/MedicineTable'
+import AddMedicineForm from './components/AddMedicineForm'
 
 function App() {
-  // Список строк таблицы, изначально берём из заглушки
-  const [medicines, setMedicines] = useState(MedicineAPI.all())
+  // Строки таблицы. Тип Medicine и сам сервис берём из отдельных
+  // модулей — App.tsx не знает, как именно данные хранятся внутри сервиса.
+  const [medicines, setMedicines] = useState<Medicine[]>(medicineService.all())
 
-  // Поля формы добавления
-  const [name, setName] = useState('')
-  const [price, setPrice] = useState('')
-  const [quantity, setQuantity] = useState('')
-
-  // Добавить новую строку через заглушку и обновить таблицу
-  const handleAdd = () => {
-    if (!name) return
-    MedicineAPI.add({
-      name,
-      price: Number(price) || 0,
-      quantity: Number(quantity) || 0,
-    })
-    setMedicines(MedicineAPI.all())
-    setName('')
-    setPrice('')
-    setQuantity('')
+  // Добавить новую запись через сервис и перечитать таблицу
+  const handleAdd = (data: { name: string; price: number; quantity: number }) => {
+    medicineService.add(data)
+    setMedicines(medicineService.all())
   }
 
-  // Удалить строку через заглушку и обновить таблицу
+  // Удалить запись через сервис и перечитать таблицу
   const handleDelete = (id: number) => {
-    MedicineAPI.delete(id)
-    setMedicines(MedicineAPI.all())
+    medicineService.delete(id)
+    setMedicines(medicineService.all())
   }
 
   return (
@@ -50,41 +42,8 @@ function App() {
         </tr>
       </thead>
       <tbody>
-        {medicines.map((item) => (
-          <tr key={item.id}>
-            <td>{item.id}</td>
-            <td>{item.name}</td>
-            <td>{item.price}</td>
-            <td>{item.quantity}</td>
-            <td>
-              <button type="button" onClick={() => handleDelete(item.id)}>
-                Удалить
-              </button>
-            </td>
-          </tr>
-        ))}
-
-        {/* Строка ввода для добавления новой записи */}
-        <tr>
-          <td></td>
-          <td>
-            <input value={name} onChange={(e) => setName(e.target.value)} />
-          </td>
-          <td>
-            <input value={price} onChange={(e) => setPrice(e.target.value)} />
-          </td>
-          <td>
-            <input
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-            />
-          </td>
-          <td>
-            <button type="button" onClick={handleAdd}>
-              Добавить
-            </button>
-          </td>
-        </tr>
+        <MedicineTable medicines={medicines} onDelete={handleDelete} />
+        <AddMedicineForm onAdd={handleAdd} />
       </tbody>
     </table>
   )
