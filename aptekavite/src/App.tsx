@@ -1,51 +1,44 @@
 // src/App.tsx
 // ---------------------------------------------------------
-// Компонент-контейнер: связывает данные (MedicineService)
-// с отображением (MedicineTable, AddMedicineForm).
-// Сам ничего не рендерит "по мелочи" — только раскладывает
-// более простые компоненты по местам и передаёт им данные
-// и обработчики.
+// Корень приложения: навигация + маршруты.
+// "/"          — таблица лекарств (HomePage)
+// "/register"  — страница регистрации (RegisterPage)
+// "/login"     — страница авторизации (LoginPage)
+//
+// Информация об авторизовавшемся пользователе хранится прямо
+// здесь, в state корневого компонента (currentUser), и передаётся
+// вниз в Nav и LoginPage через пропсы.
 // ---------------------------------------------------------
 
 import { useState } from 'react'
-import { medicineService } from './services/MedicineService'
-import type Medicine from './models/Medicine'
-import MedicineTable from './components/MedicineTable'
-import AddMedicineForm from './components/AddMedicineForm'
+import { Routes, Route } from 'react-router-dom'
+import Nav from './components/Nav'
+import HomePage from './pages/HomePage'
+import RegisterPage from './pages/RegisterPage'
+import LoginPage from './pages/LoginPage'
+import type Account from './models/Account'
 
 function App() {
-  // Строки таблицы. Тип Medicine и сам сервис берём из отдельных
-  // модулей — App.tsx не знает, как именно данные хранятся внутри сервиса.
-  const [medicines, setMedicines] = useState<Medicine[]>(medicineService.all())
+  const [currentUser, setCurrentUser] = useState<Account | null>(null)
 
-  // Добавить новую запись через сервис и перечитать таблицу
-  const handleAdd = (data: { name: string; price: number; quantity: number }) => {
-    medicineService.add(data)
-    setMedicines(medicineService.all())
+  // Вызывается из LoginPage после успешной проверки логина/пароля
+  const handleLogin = (account: Account) => {
+    setCurrentUser(account)
   }
 
-  // Удалить запись через сервис и перечитать таблицу
-  const handleDelete = (id: number) => {
-    medicineService.delete(id)
-    setMedicines(medicineService.all())
+  const handleLogout = () => {
+    setCurrentUser(null)
   }
 
   return (
-    <table border={1} cellPadding={6}>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Название</th>
-          <th>Цена, BYN</th>
-          <th>Количество</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <MedicineTable medicines={medicines} onDelete={handleDelete} />
-        <AddMedicineForm onAdd={handleAdd} />
-      </tbody>
-    </table>
+    <>
+      <Nav currentUser={currentUser} onLogout={handleLogout} />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+      </Routes>
+    </>
   )
 }
 
