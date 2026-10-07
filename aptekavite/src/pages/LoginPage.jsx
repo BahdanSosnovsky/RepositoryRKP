@@ -2,31 +2,34 @@
 // При верном логине/пароле: 1) сохраняет пользователя в state App (через onLogin),
 // 2) переходит на страницу просмотра "/" с помощью useNavigate.
 
-import { useState } from 'react' // хук состояния
-import { useNavigate } from 'react-router-dom' // хук роутера для перехода из кода
-import { accountService } from '../services/AccountService' // сервис с аккаунтами
+import { useState } from "react"; // хук состояния
+import { useNavigate } from "react-router-dom"; // хук роутера для перехода из кода
+import { accountService } from "../services/AccountService"; // сервис с аккаунтами
 
-export default function LoginPage({ onLogin }) { // onLogin пришёл из App (handleLogin)
-  const [login, setLogin] = useState('') // значение поля "Логин"
-  const [password, setPassword] = useState('') // значение поля "Пароль"
-  const [error, setError] = useState('') // текст ошибки ('' — ошибки нет)
+export default function LoginPage({ onLogin }) {
+  // onLogin пришёл из App (handleLogin)
+  const [login, setLogin] = useState(""); // значение поля "Логин"
+  const [password, setPassword] = useState(""); // значение поля "Пароль"
+  const [error, setError] = useState(""); // текст ошибки ('' — ошибки нет)
 
-  const navigate = useNavigate() // функция навигации: navigate('/путь') меняет страницу
+  const navigate = useNavigate(); // функция навигации: navigate('/путь') меняет страницу
 
-  const handleSubmit = (event) => { // вызывается при отправке формы (кнопка "Войти" / Enter)
-    event.preventDefault() // отменяем стандартную отправку формы, иначе страница перезагрузится
+  const handleSubmit = (event) => {
+    // вызывается при отправке формы (кнопка "Войти" / Enter)
+    event.preventDefault(); // отменяем стандартную отправку формы, иначе страница перезагрузится
 
-    const account = accountService.authenticate(login, password) // ищем аккаунт: вернёт Account или undefined
+    const account = accountService.authenticate(login, password); // ищем аккаунт: вернёт Account или undefined
 
-    if (!account) { // не нашли — данные неверные
-      setError('Неверный логин или пароль') // показываем ошибку
-      return // дальше не идём
+    if (!account) {
+      // не нашли — данные неверные
+      setError("Неверный логин или пароль"); // показываем ошибку
+      return; // дальше не идём
     }
 
-    setError('') // успех — убираем старую ошибку
-    onLogin(account) // отдаём пользователя в App -> он сохранится в state корневого компонента
-    navigate('/') // переходим на таблицу лекарств
-  }
+    setError(""); // успех — убираем старую ошибку
+    onLogin(account); // отдаём пользователя в App -> он сохранится в state корневого компонента
+    navigate("/"); // переходим на таблицу лекарств
+  };
 
   return (
     <div>
@@ -50,11 +53,11 @@ export default function LoginPage({ onLogin }) { // onLogin пришёл из Ap
           />
         </div>
         {/* условный рендер: если error не пустая строка — показываем красный текст */}
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {error && <p style={{ color: "red" }}>{error}</p>}
         <br />
         {/* submit -> вызовет onSubmit формы */}
         <button type="submit">Войти</button>
       </form>
     </div>
-  )
+  );
 }

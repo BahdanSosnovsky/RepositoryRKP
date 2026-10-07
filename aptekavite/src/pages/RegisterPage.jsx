@@ -1,31 +1,33 @@
 // src/pages/RegisterPage.jsx — СТРАНИЦА РЕГИСТРАЦИИ.
 // Создаёт новый аккаунт в AccountService и отправляет пользователя на страницу входа.
 
-import { useState } from 'react' // хук состояния
-import { useNavigate } from 'react-router-dom' // хук для перехода на другую страницу
-import { accountService } from '../services/AccountService' // сервис с аккаунтами
+import { useState } from "react"; // хук состояния
+import { useNavigate } from "react-router-dom"; // хук для перехода на другую страницу
+import { accountService } from "../services/AccountService"; // сервис с аккаунтами
 
 export default function RegisterPage() {
-  const [name, setName] = useState('') // поле "Имя"
-  const [login, setLogin] = useState('') // поле "Логин"
-  const [password, setPassword] = useState('') // поле "Пароль"
-  const [error, setError] = useState('') // сообщение об ошибке
+  const [name, setName] = useState(""); // поле "Имя"
+  const [login, setLogin] = useState(""); // поле "Логин"
+  const [password, setPassword] = useState(""); // поле "Пароль"
+  const [error, setError] = useState(""); // сообщение об ошибке
 
-  const navigate = useNavigate() // функция перехода между маршрутами
+  const navigate = useNavigate(); // функция перехода между маршрутами
 
-  const handleSubmit = (event) => { // отправка формы
-    event.preventDefault() // не даём браузеру перезагрузить страницу
+  const handleSubmit = (event) => {
+    // отправка формы
+    event.preventDefault(); // не даём браузеру перезагрузить страницу
 
-    const result = accountService.register({ login, password, name }) // { ok: true, account } или { ok: false, error }
+    const result = accountService.register({ login, password, name }); // { ok: true, account } или { ok: false, error }
 
-    if (!result.ok) { // регистрация не удалась (пустые поля или логин занят)
-      setError(result.error) // показываем причину
-      return
+    if (!result.ok) {
+      // регистрация не удалась (пустые поля или логин занят)
+      setError(result.error); // показываем причину
+      return;
     }
 
-    setError('') // успех — очищаем ошибку
-    navigate('/login') // после регистрации идём на страницу входа
-  }
+    setError(""); // успех — очищаем ошибку
+    navigate("/login"); // после регистрации идём на страницу входа
+  };
 
   return (
     <div>
@@ -51,10 +53,10 @@ export default function RegisterPage() {
           />
         </div>
         {/* красный текст ошибки показывается только если она есть */}
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {error && <p style={{ color: "red" }}>{error}</p>}
         <br />
         <button type="submit">Зарегистрироваться</button>
       </form>
     </div>
-  )
+  );
 }
