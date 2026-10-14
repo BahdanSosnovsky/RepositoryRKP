@@ -26,7 +26,7 @@ export default function AddMedicineForm({ onAdd }) {
   };
 
   return (
-    <tr>
+    <tr className="add-row">
       {/* пустая ячейка под колонку ID (id назначит сервис) */}
       <td></td>
       <td>
@@ -55,7 +55,11 @@ export default function AddMedicineForm({ onAdd }) {
       </td>
       <td>
         {/* type="button" — чтобы не отправлялась форма */}
-        <button type="button" onClick={handleSubmit}>
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={handleSubmit}
+        >
           Добавить
         </button>
       </td>

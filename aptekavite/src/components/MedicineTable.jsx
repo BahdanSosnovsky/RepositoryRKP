@@ -1,6 +1,6 @@
 // src/components/MedicineTable.jsx — СТРОКИ ТАБЛИЦЫ лекарств.
 // Презентационный компонент: рисует переданный список и сообщает наверх, какую строку хотят удалить.
-// Сам данные не меняет и про сервис ничего не знает.
+// Сам данные не меняет и про хранилище ничего не знает.
 
 // medicines — массив лекарств, onDelete — функция-обработчик удаления (приходит из HomePage)
 export default function MedicineTable({ medicines, onDelete }) {
@@ -20,7 +20,11 @@ export default function MedicineTable({ medicines, onDelete }) {
           <td>{item.quantity}</td>
           <td>
             {/* стрелочная функция нужна, чтобы передать id конкретной строки при клике */}
-            <button type="button" onClick={() => onDelete(item.id)}>
+            <button
+              type="button"
+              className="btn btn-danger"
+              onClick={() => onDelete(item.id)}
+            >
               Удалить
             </button>
           </td>

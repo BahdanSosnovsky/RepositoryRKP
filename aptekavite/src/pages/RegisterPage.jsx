@@ -1,62 +1,66 @@
 // src/pages/RegisterPage.jsx — СТРАНИЦА РЕГИСТРАЦИИ.
-// Создаёт новый аккаунт в AccountService и отправляет пользователя на страницу входа.
+// Регистрация идёт через Redux: dispatch(registerUser(...)). При успехе — переход на страницу входа.
 
-import { useState } from "react"; // хук состояния
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom"; // хук для перехода на другую страницу
-import { accountService } from "../services/AccountService"; // сервис с аккаунтами
+import {
+  registerUser,
+  clearAuthError,
+  selectAuthError,
+} from "../store/authSlice";
+import ErrorMessage from "../components/ErrorMessage";
 
 export default function RegisterPage() {
   const [name, setName] = useState(""); // поле "Имя"
   const [login, setLogin] = useState(""); // поле "Логин"
   const [password, setPassword] = useState(""); // поле "Пароль"
-  const [error, setError] = useState(""); // сообщение об ошибке
 
+  const dispatch = useDispatch();
+  const error = useSelector(selectAuthError); // сообщение об ошибке из хранилища
   const navigate = useNavigate(); // функция перехода между маршрутами
+
+  // При открытии страницы сбрасываем старую ошибку (например, "Неверный логин или пароль" со страницы входа)
+  useEffect(() => {
+    dispatch(clearAuthError());
+  }, [dispatch]);
 
   const handleSubmit = (event) => {
     // отправка формы
     event.preventDefault(); // не даём браузеру перезагрузить страницу
 
-    const result = accountService.register({ login, password, name }); // { ok: true, account } или { ok: false, error }
-
-    if (!result.ok) {
-      // регистрация не удалась (пустые поля или логин занят)
-      setError(result.error); // показываем причину
-      return;
-    }
-
-    setError(""); // успех — очищаем ошибку
-    navigate("/login"); // после регистрации идём на страницу входа
+    dispatch(registerUser({ login, password, name })) // thunk регистрации (на время запроса — спиннер)
+      .unwrap()
+      .then(() => navigate("/login")) // успех: после регистрации идём на страницу входа
+      .catch(() => {}); // ошибка (пустые поля / логин занят) выводится ниже из state
   };
 
   return (
-    <div>
+    <section className="card">
       <h2>Регистрация</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
+      <form className="form" onSubmit={handleSubmit}>
+        <div className="field">
           <label>Имя</label>
-          <br />
           <input value={name} onChange={(e) => setName(e.target.value)} />
         </div>
-        <div>
+        <div className="field">
           <label>Логин</label>
-          <br />
           <input value={login} onChange={(e) => setLogin(e.target.value)} />
         </div>
-        <div>
+        <div className="field">
           <label>Пароль</label>
-          <br />
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        {/* красный текст ошибки показывается только если она есть */}
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <br />
-        <button type="submit">Зарегистрироваться</button>
+        {/* текст ошибки показывается только если она есть */}
+        <ErrorMessage message={error} />
+        <button type="submit" className="btn btn-primary">
+          Зарегистрироваться
+        </button>
       </form>
-    </div>
+    </section>
   );
 }
