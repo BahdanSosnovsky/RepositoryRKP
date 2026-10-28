@@ -9,6 +9,7 @@ import { logout, selectCurrentUser } from "./store/authSlice"; // действи
 import Nav from "./components/Nav"; // панель навигации
 import LoadingOverlay from "./components/LoadingOverlay"; // спиннер загрузки
 import HomePage from "./pages/HomePage"; // страница с таблицей лекарств
+import SuppliersPage from "./pages/SuppliersPage"; // вторая форма: поставщики (таблица на TanStack Table)
 import RegisterPage from "./pages/RegisterPage"; // страница регистрации
 import LoginPage from "./pages/LoginPage"; // страница авторизации
 
@@ -37,6 +38,14 @@ function App() {
             path="/"
             element={
               currentUser ? <HomePage /> : <Navigate to="/login" replace />
+            }
+          />
+
+          {/* Адрес "/suppliers" — вторая форма (поставщики). Тоже защищена: только для вошедших */}
+          <Route
+            path="/suppliers"
+            element={
+              currentUser ? <SuppliersPage /> : <Navigate to="/login" replace />
             }
           />
 

@@ -99,7 +99,6 @@ a:hover {
 .nav-brand {
   font-weight: 600;
   color: var(--text-h);
-  margin-right: auto; /* всё остальное прижимается вправо */
 }
 
 .nav-brand:hover {
@@ -107,7 +106,13 @@ a:hover {
 }
 
 .nav-spacer {
-  flex: 1;
+  flex: 1; /* раздвигает меню: слева ссылки, справа пользователь */
+}
+
+/* Ссылка текущей страницы (класс active добавляет NavLink) */
+.nav a.active {
+  font-weight: 600;
+  text-decoration: underline;
 }
 
 .nav-user {
@@ -254,10 +259,8 @@ input:focus-visible {
 }
 
 /* ---------- Окно загрузки (спиннер) ---------- */
+/* Общий вид слоя со спиннером. Где он находится, решают модификаторы ниже */
 .overlay {
-  position: fixed; /* поверх всего экрана, не сдвигает вёрстку */
-  inset: 0;
-  z-index: 1000;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -266,6 +269,27 @@ input:focus-visible {
   color: var(--text-h);
   background: color-mix(in srgb, var(--bg) 75%, transparent);
   backdrop-filter: blur(2px);
+}
+
+/* Глобальный: поверх всего экрана, не сдвигает вёрстку */
+.overlay-fixed {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+
+/* Локальный: растягивается только на родительский .loading-block */
+.overlay-local {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  border-radius: 12px;
+}
+
+/* Контейнер для локального спиннера */
+.loading-block {
+  position: relative; /* чтобы .overlay-local считал размеры от него */
+  min-height: 160px; /* спиннер виден, даже когда внутри пока пусто */
 }
 
 .spinner {
@@ -288,4 +312,82 @@ input:focus-visible {
   .spinner {
     animation-duration: 3s;
   }
+}
+
+/* ---------- Сводка (StatsBar) ---------- */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.stat {
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-soft);
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.stat-label {
+  font-size: 14px;
+}
+
+/* ---------- Универсальная форма (EntityForm) ---------- */
+.entity-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 20px;
+}
+
+/* ---------- Таблица на TanStack Table ---------- */
+.toolbar {
+  margin-bottom: 12px;
+  max-width: 320px;
+}
+
+.table th.sortable {
+  cursor: pointer; /* заголовок кликабелен: сортировка */
+  user-select: none;
+}
+
+.table td.empty {
+  text-align: center;
+  padding: 20px;
+}
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.pagination span {
+  margin: 0 8px;
+}
+
+.pagination select {
+  margin-left: auto;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 16px;
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }

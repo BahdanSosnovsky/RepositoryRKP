@@ -8,10 +8,11 @@
 import {
   createSlice,
   createAsyncThunk,
+  createSelector,
   isPending,
   isFulfilled,
   isRejected,
-} from "@reduxjs/toolkit"; // isPending/isFulfilled/isRejected — готовые проверки типа action'а для addMatcher
+} from "@reduxjs/toolkit"; // isPending/isFulfilled/isRejected — готовые проверки типа action'а для addMatcher; createSelector — мемоизированные селекторы
 import { medicineService } from "../services/MedicineService"; // заглушка с данными
 import { delay } from "../utils/delay";
 
@@ -108,7 +109,40 @@ const medicinesSlice = createSlice({
 
 export default medicinesSlice.reducer;
 
-// Селекторы
+// ---------- СЕЛЕКТОРЫ ----------
+// Обычные ("простые") селекторы — просто достают кусок state.
 export const selectMedicines = (state) => state.medicines.items;
 export const selectMedicinesStatus = (state) => state.medicines.status;
 export const selectMedicinesError = (state) => state.medicines.error;
+
+// Остаток, ниже которого лекарство считается "заканчивающимся"
+export const LOW_STOCK_LIMIT = 60;
+
+// МЕМОИЗИРОВАННЫЙ селектор (createSelector из Reselect, он входит в Redux Toolkit).
+// Как работает: 1) входные селекторы ([selectMedicines]) достают данные из state;
+//               2) если их результат НЕ изменился (та же ссылка на массив) — функция-вычислитель
+//                  НЕ запускается, возвращается прошлый результат из кэша;
+//               3) пересчёт происходит только когда items реально изменился (add / delete / fetch).
+// Зачем: подсчёт по всему массиву — "дорогая" работа, а useSelector вызывает селектор после
+// каждого action'а. Без мемоизации объект-результат создавался бы заново каждый раз
+// и компонент перерисовывался бы без причины.
+export const selectMedicinesStats = createSelector(
+  [selectMedicines], // входной селектор
+  (items) => {
+    // результирующая функция: считает сводку по списку
+    let totalQuantity = 0; // всего единиц на складе
+    let totalValue = 0; // стоимость склада (цена * количество)
+    let lowStock = 0; // сколько позиций заканчивается
+    for (const item of items) {
+      totalQuantity += item.quantity;
+      totalValue += item.price * item.quantity;
+      if (item.quantity < LOW_STOCK_LIMIT) lowStock += 1;
+    }
+    return {
+      count: items.length,
+      totalQuantity,
+      totalValue: Math.round(totalValue * 100) / 100, // округляем до копеек
+      lowStock,
+    };
+  },
+);

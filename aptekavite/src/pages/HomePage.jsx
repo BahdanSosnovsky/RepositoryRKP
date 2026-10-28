@@ -13,16 +13,20 @@ import {
   selectMedicines,
   selectMedicinesStatus,
   selectMedicinesError,
+  selectMedicinesStats,
+  LOW_STOCK_LIMIT,
 } from "../store/medicinesSlice";
 import MedicineTable from "../components/MedicineTable"; // строки таблицы
 import AddMedicineForm from "../components/AddMedicineForm"; // строка добавления
 import ErrorMessage from "../components/ErrorMessage"; // блок ошибки
+import StatsBar from "../components/StatsBar"; // карточки со сводкой (переиспользуются и на странице поставщиков)
 
 export default function HomePage() {
   const dispatch = useDispatch(); // функция отправки действий в хранилище
   const medicines = useSelector(selectMedicines); // список лекарств из хранилища
   const status = useSelector(selectMedicinesStatus); // "idle" | "loading" | "succeeded" | "failed"
   const error = useSelector(selectMedicinesError); // текст ошибки или null
+  const stats = useSelector(selectMedicinesStats); // МЕМОИЗИРОВАННЫЙ селектор: сводка пересчитывается только при изменении списка
 
   // useEffect выполняется после первой отрисовки страницы.
   // Если список ещё ни разу не загружали (status "idle") — запускаем загрузку.
@@ -39,6 +43,16 @@ export default function HomePage() {
   return (
     <section className="page">
       <h2>Лекарства</h2>
+
+      {/* Сводка по складу: данные из мемоизированного селектора selectMedicinesStats */}
+      <StatsBar
+        items={[
+          { label: "Позиций", value: stats.count },
+          { label: "Единиц на складе", value: stats.totalQuantity },
+          { label: "Стоимость склада, BYN", value: stats.totalValue.toFixed(2) },
+          { label: `Заканчивается (< ${LOW_STOCK_LIMIT})`, value: stats.lowStock },
+        ]}
+      />
 
       {/* Ошибка выводится внутри страницы, над таблицей; спиннер её не перекрывает */}
       <ErrorMessage message={error} />

@@ -1,5 +1,5 @@
-// src/components/LoadingOverlay.jsx — ОКНО ЗАГРУЗКИ (спиннер на весь экран).
-// Показывается, пока в любом слайсе status === "loading", и пропадает сразу после ответа.
+// src/components/LoadingOverlay.jsx — ГЛОБАЛЬНОЕ ОКНО ЗАГРУЗКИ (спиннер на весь экран).
+// Показывается, пока в слайсах auth / medicines status === "loading", и пропадает сразу после ответа.
 //
 // Почему он не конфликтует с ошибками:
 //  1) он смотрит только на статус загрузки (selectIsLoading), ошибок не читает и не рисует;
@@ -10,6 +10,7 @@
 
 import { useSelector } from "react-redux"; // хук для чтения данных из хранилища
 import { selectIsLoading } from "../store/selectors";
+import Spinner from "./Spinner"; // общий индикатор
 
 export default function LoadingOverlay() {
   const isLoading = useSelector(selectIsLoading); // true/false; компонент перерисуется при изменении
@@ -17,10 +18,9 @@ export default function LoadingOverlay() {
   if (!isLoading) return null; // нет загрузки — ничего не рисуем
 
   return (
-    // role="status" и aria-live — чтобы программы чтения с экрана озвучили "Загрузка"
-    <div className="overlay" role="status" aria-live="polite">
-      <div className="spinner" />
-      <span>Загрузка...</span>
+    // overlay-fixed — поверх всего экрана. role="status" и aria-live — чтобы программы чтения с экрана озвучили "Загрузка"
+    <div className="overlay overlay-fixed" role="status" aria-live="polite">
+      <Spinner />
     </div>
   );
 }
