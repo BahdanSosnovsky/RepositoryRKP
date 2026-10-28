@@ -5,11 +5,7 @@
 import { useEffect, useState } from "react"; // useEffect — эффекты, useState — поля формы
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom"; // хук роутера для перехода из кода
-import {
-  loginUser,
-  clearAuthError,
-  selectAuthError,
-} from "../store/authSlice";
+import { loginUser, clearAuthError, selectAuthError } from "../store/authSlice";
 import ErrorMessage from "../components/ErrorMessage";
 
 export default function LoginPage() {

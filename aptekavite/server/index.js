@@ -13,8 +13,8 @@
 // Postman/curl, не трогая интерфейс.
 // ---------------------------------------------------------
 
-import express from 'express';
-import cors from 'cors';
+import express from "express";
+import cors from "cors";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -27,25 +27,43 @@ app.use(express.json());
 // "База данных" аптеки — просто массив в памяти (заглушка).
 // id, название, категория, цена (руб.), количество на складе.
 let medicines = [
-  { id: 1, name: 'Парацетамол', category: 'Жаропонижающее', price: 45, quantity: 120 },
-  { id: 2, name: 'Аспирин', category: 'Обезболивающее', price: 60, quantity: 80 },
-  { id: 3, name: 'Ибупрофен', category: 'Противовоспалительное', price: 95, quantity: 50 },
+  {
+    id: 1,
+    name: "Парацетамол",
+    category: "Жаропонижающее",
+    price: 45,
+    quantity: 120,
+  },
+  {
+    id: 2,
+    name: "Аспирин",
+    category: "Обезболивающее",
+    price: 60,
+    quantity: 80,
+  },
+  {
+    id: 3,
+    name: "Ибупрофен",
+    category: "Противовоспалительное",
+    price: 95,
+    quantity: 50,
+  },
 ];
 
 // Простой корневой маршрут — чтобы проверить, что сервер жив
-app.get('/', (req, res) => {
-  res.send('Сервер-заглушка аптеки работает. Используйте /api/medicines');
+app.get("/", (req, res) => {
+  res.send("Сервер-заглушка аптеки работает. Используйте /api/medicines");
 });
 
 // GET /api/medicines — получить весь список лекарств
-app.get('/api/medicines', (req, res) => {
+app.get("/api/medicines", (req, res) => {
   res.json(medicines);
 });
 
 // POST /api/medicines — добавить новое лекарство (заглушка)
 // Ожидает в теле запроса JSON вида:
 // { "name": "...", "category": "...", "price": 100, "quantity": 10 }
-app.post('/api/medicines', (req, res) => {
+app.post("/api/medicines", (req, res) => {
   const { name, category, price, quantity } = req.body || {};
 
   // Минимальная проверка, что название передано
@@ -56,7 +74,7 @@ app.post('/api/medicines', (req, res) => {
   const newMedicine = {
     id: Date.now(), // простой способ сгенерировать уникальный id
     name,
-    category: category || 'Без категории',
+    category: category || "Без категории",
     price: Number(price) || 0,
     quantity: Number(quantity) || 0,
   };
@@ -66,14 +84,14 @@ app.post('/api/medicines', (req, res) => {
 });
 
 // DELETE /api/medicines/:id — удалить лекарство по id (заглушка)
-app.delete('/api/medicines/:id', (req, res) => {
+app.delete("/api/medicines/:id", (req, res) => {
   const id = Number(req.params.id);
   const existed = medicines.some((item) => item.id === id);
 
   medicines = medicines.filter((item) => item.id !== id);
 
   if (!existed) {
-    return res.status(404).json({ error: 'Лекарство с таким id не найдено' });
+    return res.status(404).json({ error: "Лекарство с таким id не найдено" });
   }
 
   res.status(204).send();

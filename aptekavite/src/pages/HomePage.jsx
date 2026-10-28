@@ -49,8 +49,14 @@ export default function HomePage() {
         items={[
           { label: "Позиций", value: stats.count },
           { label: "Единиц на складе", value: stats.totalQuantity },
-          { label: "Стоимость склада, BYN", value: stats.totalValue.toFixed(2) },
-          { label: `Заканчивается (< ${LOW_STOCK_LIMIT})`, value: stats.lowStock },
+          {
+            label: "Стоимость склада, BYN",
+            value: stats.totalValue.toFixed(2),
+          },
+          {
+            label: `Заканчивается (< ${LOW_STOCK_LIMIT})`,
+            value: stats.lowStock,
+          },
         ]}
       />
 
